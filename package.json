@@ -1,0 +1,28 @@
+{
+  "name": "phone-auth",
+  "version": "1.0.0",
+  "description": "Build an Authentication service using twilio api.    - User enters Phone number  - User receives text with code to enter in client  - User enters security code  - An authenticated user is returned",
+  "main": "app.js",
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zimmermanw84/phone-auth.git"
+  },
+  "author": "Walt Zimmerman",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/zimmermanw84/phone-auth/issues"
+  },
+  "homepage": "https://github.com/zimmermanw84/phone-auth#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "chai": "^3.5.0",
+    "console-stamp": "^0.2.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.0",
+    "mocha": "^3.0.2",
+    "supertest": "^2.0.0"
+  }
+}
