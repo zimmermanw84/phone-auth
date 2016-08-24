@@ -17,12 +17,14 @@
   },
   "homepage": "https://github.com/zimmermanw84/phone-auth#readme",
   "dependencies": {
+    "aws-sdk": "^2.5.3",
     "body-parser": "^1.15.2",
     "chai": "^3.5.0",
     "console-stamp": "^0.2.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "mocha": "^3.0.2",
+    "q": "^1.4.1",
     "supertest": "^2.0.0"
   }
 }

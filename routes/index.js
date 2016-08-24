@@ -10,10 +10,16 @@
 const express = require('express');
 const router = express.Router();
 
+// Controllers
+const userController = require("../controllers/users");
+
 // For heartbeat test
 router.get('/', (req, res, next) => {
 	// for testing
 	return res.json({ message: "Success" });
 });
+
+// Users
+router.post('/users', userController.userPostHandler);
 
 module.exports = router;
