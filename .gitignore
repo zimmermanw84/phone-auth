@@ -5,3 +5,5 @@
 !.elasticbeanstalk/*.global.yml
 
 node_modules/
+
+shared-local-instance.db

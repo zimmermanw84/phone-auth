@@ -12,14 +12,24 @@ const dynamodb = require("../config/dynamodb");
 const params = {
     TableName : "Users",
     KeySchema: [       
-        { AttributeName: "phone_number", KeyType: "HASH"},  //Partition key
+        { AttributeName: "id", KeyType: "HASH"},  //Partition key
     ],
-    AttributeDefinitions: [       
+    AttributeDefinitions: [
+    		{ AttributeName: "id", AttributeType: "S" },
         { AttributeName: "phone_number", AttributeType: "S" },
         { AttributeName: "auth_token", AttributeType: "S" },
         { AttributeName: "verification_code", AttributeType: "S" }
     ],
     GlobalSecondaryIndexes: [
+	    {
+    		IndexName: "phone_number",
+    		KeySchema: [ { AttributeName: "phone_number", KeyType: "HASH" } ],
+    		Projection: { ProjectionType: "ALL" },
+    		ProvisionedThroughput: { // throughput to provision to the index
+          ReadCapacityUnits: 1,
+          WriteCapacityUnits: 1,
+        }
+    	},
     	{
     		IndexName: "auth_token",
     		KeySchema: [ { AttributeName: "auth_token", KeyType: "HASH" } ],

@@ -19,6 +19,9 @@ router.get('/', (req, res, next) => {
 	return res.json({ message: "Success" });
 });
 
+// Get user by phone number
+router.get('/users/numbers/:number', userController.getUserByNumberHandler);
+
 // Users
 router.post('/users', userController.userPostHandler);
 

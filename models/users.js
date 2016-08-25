@@ -30,15 +30,22 @@ const TABLE_NAME = "Users";
 // Auth token generator
 const genToken = require("../utils/gen-token");
 
+// Unique ID Generator
+const uuid = require('node-uuid');
+
 module.exports = class User {
 
 	constructor(userData) {
-		this.phone_number = userData.phone_number || null;
-		this.first_name = userData.first_name || null;
-		this.last_name = userData.last_name || null;
-		this.username = userData.username || null;
-		this.auth_token = userData.auth_token || null;
-		this.verification_code = userData.verification_code || null;
+		if(userData) {
+			this.id = uuid.v4();
+			this.phone_number = userData.phone_number || null;
+			this.first_name = userData.first_name || null;
+			this.last_name = userData.last_name || null;
+			this.username = userData.username || null;
+			this.auth_token = userData.auth_token || null;
+			this.verification_code = userData.verification_code || null;
+			this.verification_code_created_at = null;
+		};
 	};
 
 	/**
@@ -47,13 +54,14 @@ module.exports = class User {
 	*/
 	save() {
 		return Promise((resolve, reject) => {
-			if(!this.phone_number) reject(new Error("No Phone Number Given"));
+			if(!this._isValidPhoneNumber(this.phone_number)) reject(new Error("No Phone Number Given"));
 
 			dynamodb.putItem({
 				TableName: TABLE_NAME,
 				Item: {
+					id: { S: this.id },
 					phone_number: { S: this.phone_number },
-					auth_token: { S: genToken(this.phone_number) },
+					auth_token: { S: genToken(this.phone_number) }
 				}
 			}, (err, userData) => {
 				if(err) reject(err);
@@ -76,5 +84,92 @@ module.exports = class User {
 	* @param searchData - Data to search for
 	* Update a user based on user data input
 	*/
-	findBy(indexName, searchData) {};
+	findBy(keyName, queryValue) {
+		let queryObj = {
+			TableName: TABLE_NAME,
+			IndexName: keyName, // our keyname is our indexname
+			KeyConditions: {},
+			Select: 'ALL_ATTRIBUTES',
+		};
+		// Add search Key conditions
+		queryObj.KeyConditions[keyName] = {
+			ComparisonOperator: "EQ",
+			AttributeValueList: [ { S: queryValue } ]
+		};
+
+		return Promise((resolve, reject) => {
+			dynamodb.query(queryObj, (err, userData) => {
+				if(err || userData["Count"] > 1 /* should only return one user */) {
+					reject(err);
+				} else {
+					// Add attributes to model
+					// Wrap if data is returned
+					if(userData.Count > 0) {
+						console.log("USER DATA SHOULD UPDATE")
+						this._addDataToModel(userData.Items[0]);
+					}
+
+					resolve(userData);
+				}
+			});
+		});
+	};
+
+	/**
+	* _isValidPhoneNumber {function}
+	* @param phoneNumber - phone number
+	* Check to see if phone numbe is valid
+	*/
+	_isValidPhoneNumber(phoneNumber) {
+		// Some phonenumber validation logic
+		// Better logic than this WIP:
+		return (phoneNumber && phoneNumber.length > 8);
+	};
+
+	/**
+	* genVerificationCode {function}
+	* generate verification code
+	*/
+	genVerificationCode() {
+		this.verification_code = (Math.floor(Math.random() * (999999 - 1 + 1) + 1)).toString();
+		this.verification_code_created_at = (new Date()).toString();
+
+		let queryObj = {
+			TableName: TABLE_NAME,
+			Key: { id: { S: this.id } },
+			AttributeUpdates: {
+				verification_code: {
+					Action: "PUT",
+					Value: { S: this.verification_code }
+				},
+				verification_code_created_at: {
+					Action: "PUT",
+					Value: { S: this.verification_code_created_at }
+				}
+			}
+		};
+
+		console.log("QUERY OBJ", queryObj);
+		return Promise((resolve, reject) => {
+			dynamodb.updateItem(queryObj, (err, userData) => {
+				if(err) reject(err);
+				else resolve(userData);
+			});
+		});
+	};
+
+	/**
+	* _addDataToModel {function}
+	* Adds data to model after data returned from dynamo
+	*/
+	_addDataToModel(userData) {
+		this.id = userData.id.S;
+		this.phone_number = userData.phone_number.S;
+		this.first_name = (userData.first_name) ? userData.first_name.S : null;
+		this.last_name = (userData.last_name) ? userData.last_name.S : null;
+		this.username = (userData.username) ? userData.username.S : null;
+		this.auth_token = (userData.auth_token) ? userData.auth_token.S : null;
+		this.verification_code = (userData.verification_code) ? userData.verification_code.S : null;
+		this.verification_code_created_at = (userData.verification_code_created_at) ? userData.verification_code_created_at.S : null;
+	};
 };
