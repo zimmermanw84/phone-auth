@@ -8,15 +8,18 @@
 
 let accountSid;
 let authToken;
+let twilioPhone;
 
 // Twilio Credentials 
 if(process.env.NODE_ENV === "production") {
 	accountSid = process.env.TWILIO_ACCOUNT_SID;
 	authToken = process.env.TWILIO_AUTH_TOKEN;
+	twilioPhone = process.env.TWILIO_PHONE;
 } else {
 	let creds = require("./twilioCreds");
 	accountSid = creds.ACCOUNT_SID;
 	authToken = creds.AUTH_TOKEN;
+	twilioPhone = creds.TWILIO_PHONE
 }
 
 // Promise
@@ -31,7 +34,7 @@ module.exports = (numberTo, verificationNum) => {
 		client.messages.create({
 			body: `Hello your verification number is ${verificationNum}. It's good for 5 min only!`,
 			to: `+1${numberTo}`,
-			from: `+16506678412` // Current Twilio Number
+			from: `+1${twilioPhone}` // Current Twilio Number
 		}, (err, message) => {
 			if(err) reject(err);
 			else resolve(message);
