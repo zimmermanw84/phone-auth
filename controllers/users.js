@@ -75,6 +75,7 @@ const getUserByNumberHandler = (req, res, next) => {
 	user
 		.findBy("phone_number", req.params.number)
 		.then((u) => {
+			console.log("U", u)
 			if(!u) {
 				return res.status(404).send();
 			} else {
@@ -105,7 +106,7 @@ const verifyUserHandler = (req, res, next) => {
 			// Check phone_numbers match and then send auth_token
 			if(u && (user.phone_number === req.params.number) &&
 				// Current expiration of verification code is 5 min
-				(isVerificationCodeExpired(user.verification_code_created_at))
+				(isVerificationCodeValid(user.verification_code_created_at))
 				) {
 				return res.json({authoization: user.auth_token});
 			} else {
@@ -158,7 +159,7 @@ const minFromCreated = (min, timeCreated) => {
   return created.setMinutes(created.getMinutes() + min);
 };
 
-const isVerificationCodeExpired = (timeCreated) => {
+const isVerificationCodeValid = (timeCreated) => {
 	return (minFromCreated(5, timeCreated) > new Date(timeCreated));
 };
 

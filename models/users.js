@@ -105,9 +105,9 @@ module.exports = class User {
 					// Wrap if data is returned
 					if(userData.Count > 0) {
 						this._addDataToModel(userData.Items[0]);
-						resolve(userData);
+						return resolve(this);
 					} else {
-						resolve(null);
+						return resolve(null);
 					}
 				}
 			});
