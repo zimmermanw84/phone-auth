@@ -10,7 +10,7 @@ Build an Authentication service using twilio api.
 - DynamoDB
 - Twilio API
 
-### Api
+### Api (no host on purpose: email me or clone)
 
 ```
 POST /users
