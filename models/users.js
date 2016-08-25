@@ -60,8 +60,7 @@ module.exports = class User {
 				TableName: TABLE_NAME,
 				Item: {
 					id: { S: this.id },
-					phone_number: { S: this.phone_number },
-					auth_token: { S: genToken(this.phone_number) }
+					phone_number: { S: this.phone_number }
 				}
 			}, (err, userData) => {
 				if(err) reject(err);
@@ -153,7 +152,11 @@ module.exports = class User {
 				},
 				verification_code_created_at: {
 					Action: "PUT",
-					Value: { S: this.verification_code_created_at }
+					Value: { S: this.verification_code_created_at },
+				},
+				auth_token: {
+					Action: "PUT",
+					Value: { S: genToken(this.phone_number) }
 				}
 			}
 		};

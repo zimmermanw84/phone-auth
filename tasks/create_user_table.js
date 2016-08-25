@@ -55,7 +55,7 @@ const params = {
     }
 };
 
-module.exports = () => {
+// module.exports = () => {
 	// Create EBS migrations from the api
 	dynamodb.createTable(params, (err, data) => {
 	    if (err) {
@@ -64,4 +64,4 @@ module.exports = () => {
 	        console.log("Created table. Table description JSON:", JSON.stringify(data, null, 2));
 	    }
 	});
-}
+// }

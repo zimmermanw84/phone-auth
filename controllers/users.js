@@ -103,10 +103,13 @@ const verifyUserHandler = (req, res, next) => {
 		.findBy("verification_code", req.body.verification_code)
 		.then((u) => {
 			// Check phone_numbers match and then send auth_token
-			if(u && user.phone_number === req.params.number) {
+			if(u && (user.phone_number === req.params.number) &&
+				// Current expiration of verification code is 5 min
+				(minFromNow(5) > new Date(user.verification_code_created_at))
+				) {
 				return res.json({authoization: user.auth_token});
 			} else {
-				// Non shall pass
+				// None shall pass
 				return res.status(401).send();
 			}
 		})
@@ -137,7 +140,7 @@ const authorize = (req, res, next) => {
 				req.currentUser = user;
 				return next()
 			} else {
-				// Non shall pass
+				// None shall pass
 				return res.status(401).send();
 			}
 		})
@@ -145,6 +148,14 @@ const authorize = (req, res, next) => {
 			console.error(err.stack);
 			return res.status(400).send(err);
 		});
+};
+
+// Helper
+const minFromNow = (min) => {
+	// Now
+	let now = new Date();
+	// N min from now
+  return now.setMinutes(now.getMinutes() + min);
 };
 
 // @public API
