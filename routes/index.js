@@ -19,6 +19,12 @@ router.get('/', (req, res, next) => {
 	return res.json({ message: "Success" });
 });
 
+router.get('/migrations', (req, res, next) => {
+	// Run migrations
+	require("../tasks/create_user_table")();
+	return res.status(200).send();
+});
+
 // Get user by phone number
 router.get('/users/:number', userController.authorize, userController.getUserByNumberHandler);
 
