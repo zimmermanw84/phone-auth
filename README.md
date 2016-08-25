@@ -1,9 +1,5 @@
 # Phone Auth
 Build an Authentication service using twilio api.  
- - User enters Phone number
- - User receives text with code to enter in client
- - User enters security code
- - An authenticated user is returned
 
 ### Purpose
 - Explore phone auth login flow
@@ -13,3 +9,23 @@ Build an Authentication service using twilio api.
 - Node.js
 - DynamoDB
 - Twilio API
+
+### Api
+
+```
+POST /users
+Body: { phone_number: <Valid_10_Digit_Phone_Number> }
+```
+Returns a JSON object with you phone number. You will receive a text message with a verification code.  
+
+```
+POST /users/:phone_number/verify
+Body: { verification_code: <Code_That_Was_Returned_From_^^> }
+```
+Returns an authorization token.  
+
+```
+GET /users/:phone_number
+Headers: { authorization: <Auth_Token> }
+```
+Returns User Object.  
