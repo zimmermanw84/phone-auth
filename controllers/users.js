@@ -75,7 +75,6 @@ const getUserByNumberHandler = (req, res, next) => {
 	user
 		.findBy("phone_number", req.params.number)
 		.then((u) => {
-			console.log("U", u)
 			if(!u) {
 				return res.status(404).send();
 			} else {
