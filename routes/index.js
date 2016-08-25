@@ -20,9 +20,12 @@ router.get('/', (req, res, next) => {
 });
 
 // Get user by phone number
-router.get('/users/numbers/:number', userController.getUserByNumberHandler);
+router.get('/users/:number', userController.authorize, userController.getUserByNumberHandler);
 
-// Users
+// Create AND Trigger SMS
 router.post('/users', userController.userPostHandler);
+
+// Send verification code to retrieve auth_token
+router.post('/users/:number/verify', userController.verifyUserHandler);
 
 module.exports = router;

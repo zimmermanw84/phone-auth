@@ -49,7 +49,7 @@ const userPostHandler = (req, res, next) => {
 			return twilioClient(user.phone_number, user.verification_code);
 		})
 		.then(() => {
-			return res.status((userExists) ? 200 : 201).json(user);
+			return res.status((userExists) ? 200 : 201).json();
 		})
 		.catch((err) => {
 			console.error(err.stack);
@@ -66,17 +66,80 @@ const userPostHandler = (req, res, next) => {
 */
 
 const getUserByNumberHandler = (req, res, next) => {
+	// Make sure currentUser(from auth) Phonenumber matches params number
+	if(req.currentUser.phone_number !== req.params.number) return res.status(401).send();
+
 	// Empty user for DB api
 	let user = new User();
 
 	user
 		.findBy("phone_number", req.params.number)
 		.then((u) => {
-			if(!user) {
+			if(!u) {
 				return res.status(404).send();
+			} else {
+				return res.json(user);
 			}
+		})
+		.catch((err) => {
+			console.error(err.stack);
+			return res.status(400).send(err);
+		});
+};
 
-			return res.json(user);
+/*
+  =====================================================================================
+  User verifyUserHandler
+
+  Exchange verify code for auth_token
+  =====================================================================================
+*/
+
+const verifyUserHandler = (req, res, next) => {
+	if(!req.body.verification_code) return res.status(403).send();
+	let user = new User();
+
+	user
+		.findBy("verification_code", req.body.verification_code)
+		.then((u) => {
+			// Check phone_numbers match and then send auth_token
+			if(u && user.phone_number === req.params.number) {
+				return res.json({authoization: user.auth_token});
+			} else {
+				// Non shall pass
+				return res.status(401).send();
+			}
+		})
+		.catch((err) => {
+			console.error(err.stack);
+			return res.status(400).send(err);
+		});
+};
+
+/*
+  =====================================================================================
+  User Authorize
+
+  A naive implementation
+  =====================================================================================
+*/
+
+const authorize = (req, res, next) => {
+	if(!req.headers.authorization) return res.status(401).send();
+
+	let user = new User();
+
+	user
+		.findBy("auth_token", req.headers.authorization)
+		.then((u) => {
+			if(u) {
+				// User exists
+				req.currentUser = user;
+				return next()
+			} else {
+				// Non shall pass
+				return res.status(401).send();
+			}
 		})
 		.catch((err) => {
 			console.error(err.stack);
@@ -87,5 +150,7 @@ const getUserByNumberHandler = (req, res, next) => {
 // @public API
 module.exports = {
 	userPostHandler,
-	getUserByNumberHandler
+	getUserByNumberHandler,
+	verifyUserHandler,
+	authorize
 };
