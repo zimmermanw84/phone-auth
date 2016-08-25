@@ -105,11 +105,11 @@ module.exports = class User {
 					// Add attributes to model
 					// Wrap if data is returned
 					if(userData.Count > 0) {
-						console.log("USER DATA SHOULD UPDATE")
 						this._addDataToModel(userData.Items[0]);
+						resolve(userData);
+					} else {
+						resolve(null);
 					}
-
-					resolve(userData);
 				}
 			});
 		});
@@ -149,7 +149,6 @@ module.exports = class User {
 			}
 		};
 
-		console.log("QUERY OBJ", queryObj);
 		return Promise((resolve, reject) => {
 			dynamodb.updateItem(queryObj, (err, userData) => {
 				if(err) reject(err);

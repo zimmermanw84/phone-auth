@@ -7,6 +7,9 @@
 // Models
 const User = require("../models/users");
 
+// Twilio Client
+const twilioClient = require("../config/twilio");
+
 /*
   =====================================================================================
   User userPostHandler
@@ -31,19 +34,19 @@ const userPostHandler = (req, res, next) => {
 	user
 		.findBy("phone_number", req.body.phone_number)
 		.then((u) => {
-			// console.log("u", u)
-			// user exists
-			if(u.Count > 0) {
-				console.log("OLD USER")
+			if(u) {
+				// user exists
 				userExists = true;
-				console.log("IDs user u",user.id, u.Items[0].id);
 				return user.genVerificationCode();
 				// Create and update random code
 			} else {
-				console.log("NEW USER")
 			// Not exists
 				return user.save().then(() => { return user.genVerificationCode(); });
 			}
+		})
+		.then(() => {
+			// Send SMS
+			return twilioClient(user.phone_number, user.verification_code);
 		})
 		.then(() => {
 			return res.status((userExists) ? 200 : 201).json(user);
