@@ -105,7 +105,7 @@ const verifyUserHandler = (req, res, next) => {
 			// Check phone_numbers match and then send auth_token
 			if(u && (user.phone_number === req.params.number) &&
 				// Current expiration of verification code is 5 min
-				(minFromNow(5) > new Date(user.verification_code_created_at))
+				(isVerificationCodeExpired(user.verification_code_created_at))
 				) {
 				return res.json({authoization: user.auth_token});
 			} else {
@@ -150,12 +150,16 @@ const authorize = (req, res, next) => {
 		});
 };
 
-// Helper
-const minFromNow = (min) => {
+// Helpers
+const minFromCreated = (min, timeCreated) => {
 	// Now
-	let now = new Date();
+	let created = new Date(timeCreated);
 	// N min from now
-  return now.setMinutes(now.getMinutes() + min);
+  return created.setMinutes(created.getMinutes() + min);
+};
+
+const isVerificationCodeExpired = (timeCreated) => {
+	return (minFromCreated(5, timeCreated) > new Date(timeCreated));
 };
 
 // @public API
