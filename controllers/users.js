@@ -49,7 +49,7 @@ const userPostHandler = (req, res, next) => {
 			return twilioClient(user.phone_number, user.verification_code);
 		})
 		.then(() => {
-			return res.status((userExists) ? 200 : 201).json(user);
+			return res.status((userExists) ? 200 : 201).json({ phone_number: user.phone_number });
 		})
 		.catch((err) => {
 			console.error(err.stack);
