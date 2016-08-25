@@ -49,11 +49,11 @@ const userPostHandler = (req, res, next) => {
 			return twilioClient(user.phone_number, user.verification_code);
 		})
 		.then(() => {
-			return res.status((userExists) ? 200 : 201).json();
+			return res.status((userExists) ? 200 : 201).json(user);
 		})
 		.catch((err) => {
 			console.error(err.stack);
-			return res.status(400).send(err);
+			return res.status(400).json({ error: err.message});
 		});
 };
 
@@ -112,7 +112,7 @@ const verifyUserHandler = (req, res, next) => {
 		})
 		.catch((err) => {
 			console.error(err.stack);
-			return res.status(400).send(err);
+			return res.status(400).send();
 		});
 };
 

@@ -38,7 +38,7 @@ module.exports = class User {
 	constructor(userData) {
 		if(userData) {
 			this.id = uuid.v4();
-			this.phone_number = userData.phone_number || null;
+			this.phone_number = this._strip(userData.phone_number) || null;
 			this.first_name = userData.first_name || null;
 			this.last_name = userData.last_name || null;
 			this.username = userData.username || null;
@@ -54,7 +54,7 @@ module.exports = class User {
 	*/
 	save() {
 		return Promise((resolve, reject) => {
-			if(!this._isValidPhoneNumber(this.phone_number)) reject(new Error("No Phone Number Given"));
+			if(!this._isValidPhoneNumber(this.phone_number)) reject(new Error("Field not valid: phone_number"));
 
 			dynamodb.putItem({
 				TableName: TABLE_NAME,
@@ -121,9 +121,18 @@ module.exports = class User {
 	* Check to see if phone numbe is valid
 	*/
 	_isValidPhoneNumber(phoneNumber) {
-		// Some phonenumber validation logic
-		// Better logic than this WIP:
-		return (phoneNumber && phoneNumber.length > 8);
+		// WIP: Better logic than this
+		return (phoneNumber && phoneNumber.length === 10); // US Phone numbers for now
+	};
+
+	/**
+	* _strip {function}
+	* @params number - phone number
+	* Strips all spacial chars from number
+	* @return phoneNumber
+	*/
+	_strip(phoneNumber) {
+		return phoneNumber.replace(/\D/g,'');
 	};
 
 	/**
