@@ -78,7 +78,7 @@ const getUserByNumberHandler = (req, res, next) => {
 			if(!u) {
 				return res.status(404).send();
 			} else {
-				return res.json(user);
+				return res.json(user.serialize());
 			}
 		})
 		.catch((err) => {
@@ -121,36 +121,47 @@ const verifyUserHandler = (req, res, next) => {
 
 /*
   =====================================================================================
-  User Authorize
+  User userPutHandler
 
-  A naive implementation
+  Update user
   =====================================================================================
 */
 
-const authorize = (req, res, next) => {
-	if(!req.headers.authorization) return res.status(401).send();
-
+const userPutHandler = (req, res, next) => {
+	// First get user
 	let user = new User();
+	let userCanUpdate = true;
 
 	user
-		.findBy("auth_token", req.headers.authorization)
+		.findBy("phone_number", req.params.number)
 		.then((u) => {
-			if(u) {
-				// User exists
-				req.currentUser = user;
-				return next()
+			if(!u) return res.status(404).send();
+			// Check if user found matched auth_user
+			if(user.phone_number === req.params.number) {
+				// then update user
+				return user.update(req.body);
 			} else {
-				// None shall pass
+				userCanUpdate = false;
 				return res.status(401).send();
+			}
+		})
+		.then((u) => {
+			if(userCanUpdate) {
+				return res.status(202).send();
 			}
 		})
 		.catch((err) => {
 			console.error(err.stack);
-			return res.status(400).send(err);
+			return res.status(400).send();
 		});
+
 };
 
-// Helpers
+/*
+  =====================================================================================
+  HELPERS
+  =====================================================================================
+*/
 const minFromCreated = (min, timeCreated) => {
 	// Now
 	let created = new Date(timeCreated);
@@ -167,5 +178,5 @@ module.exports = {
 	userPostHandler,
 	getUserByNumberHandler,
 	verifyUserHandler,
-	authorize
+	userPutHandler
 };

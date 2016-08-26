@@ -46,6 +46,17 @@ module.exports = class User {
 			this.verification_code = userData.verification_code || null;
 			this.verification_code_created_at = null;
 		};
+		// Property Types (for dynamoDB update query object building)
+		this.propTypes = {
+			phone_number: { type: "S", isUpdatable: true},
+			first_name: { type: "S", isUpdatable: true},
+			last_name: { type: "S", isUpdatable: true},
+			username: { type: "S", isUpdatable: true},
+			id: { type: "S", isUpdatable: false},
+			auth_token: { type: "S", isUpdatable: false},
+			verification_code: { type: "S", isUpdatable: false},
+			verification_code_created_at: { type: "S", isUpdatable: false}
+		};
 	};
 
 	/**
@@ -78,7 +89,14 @@ module.exports = class User {
 	* @param userData - data to update
 	* Update a user based on user data input
 	*/
-	update(userData) {};
+	update(userData) {
+		return Promise((resolve, reject) => {
+			dynamodb.updateItem(this._genUpdateQueryObject(userData), (err, userData) => {
+				if(err) reject(err);
+				else resolve(userData);
+			});
+		});
+	};
 
 	/**
 	* findBy {function}
@@ -192,6 +210,57 @@ module.exports = class User {
 		});
 
 	}
+
+	/**
+	* _genUpdateQueryObject {function}
+	* @param updateData {Object} - key/value data used to generate queryobject 
+	* Build a query object for DynamoDB based on request body
+	*/	
+	_genUpdateQueryObject(updateData) {
+		let queryObj = {
+			TableName: TABLE_NAME,
+			Key: { id: { S: this.id } },
+			AttributeUpdates: {}
+		};
+
+		// properties to update
+		let propertiesToUpdate = Object.keys(updateData);
+		let value;
+
+		propertiesToUpdate.forEach((propertyToUpdate) => {
+			if(this.propTypes[propertyToUpdate] !== undefined && 
+					this.propTypes[propertyToUpdate].isUpdatable) {
+
+				// Build 'Value' query object
+				value = {};
+				value[`${this.propTypes[propertyToUpdate].type}`] = updateData[propertyToUpdate];
+
+				// Add update query object
+				queryObj.AttributeUpdates[propertyToUpdate] = {
+					Action: "PUT",
+					Value: value
+				};
+			}
+		});
+
+		return queryObj;
+	};
+
+	/**
+	* serialize {function}
+	* Returns public props (not really serializing/de-serializing)
+	*/
+	serialize() {
+		let props = {};
+
+		Object.keys(this.propTypes).map((prop) => {
+			if(this.propTypes[prop].isUpdatable || prop === 'id' /*need to add id specifically*/) {
+		   props[prop] = this[prop];
+			}
+		});
+
+		return props;
+	};
 
 	/**
 	* _addDataToModel {function}

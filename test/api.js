@@ -20,6 +20,8 @@ let TEST_USER;
 
 let verification_code;
 
+let auth_token;
+
 describe(`Test to ensure the API is returning correct status codes and data`, () => {
 	// Setup
 	before(() => {
@@ -38,8 +40,9 @@ describe(`Test to ensure the API is returning correct status codes and data`, ()
 			.then((u) => {
 				// Setup for next test
 				verification_code = u.verification_code;
+				auth_token = u.auth_token;
 				api.get('/users/1231234567')
-					.set("authorization", u.auth_token)
+					.set("authorization", auth_token)
 					.expect(200, done);
 			})
 			.catch((err) => {
@@ -70,6 +73,30 @@ describe(`Test to ensure the API is returning correct status codes and data`, ()
 		api.post('/users/1231234567/verify')
 			.send({ verification_code: "NOT VALID CODE" })
 			.expect(401, done);
+	});
+
+	it(`PUT /users/:phone_number should return 401 with no authorization token`, (done) => {
+		api.put('/users/1231234567')
+			.expect(401, done);
+	});
+
+	it(`PUT /users/:phone_number should return 202 with valid authorization token`, (done) => {
+		api.put('/users/1231234567')
+			.set("authorization", auth_token)
+			.send({ first_name: 'SomeUpdatedUser' }) // Sending update next test we will test if the value got updated
+			.expect(202, done);
+	});
+
+	it(`PUT /users/:phone_number should update user`, (done) => {
+			// Grab updated user
+			api
+				.get('/users/1231234567')
+				.set("authorization", auth_token)
+				.expect((res) => {
+					expect(TEST_USER.first_name).to.not.equal(res.body.first_name);
+					expect(res.body.first_name).to.equal('SomeUpdatedUser');
+				})
+				.expect(200, done);
 	});
 
 	after(() => {
