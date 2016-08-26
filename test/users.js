@@ -6,7 +6,6 @@
 
 "use strict";
 const expect = require('chai').expect;
-const supertest = require('supertest');
 
 // Model
 const User = require("../models/users");
@@ -19,21 +18,21 @@ const TEST_USER_DATA_PASS = { "phone_number" : "1231234567" }
 let TEST_USER;
 
 describe(`User Unit Tests`, () => {
-	it(`Should fail User#save when given invalid phone_number`, (done) => {
-		let FAIL_USER = new User(TEST_USER_DATA_FAIL);
+	// it(`Should fail User#save when given invalid phone_number`, (done) => {
+	// 	let FAIL_USER = new User(TEST_USER_DATA_FAIL);
 
-		FAIL_USER
-			.save()
-			.then((u) => {
-				// Should not hit this block
-				expect(u).to.be.undefined;
-				done();
-			})
-			.catch((err) => {
-				expect(err.message).to.equal("Field not valid: phone_number"); 
-				done();
-			});
-	});
+	// 	FAIL_USER
+	// 		.save()
+	// 		.then((u) => {
+	// 			// Should not hit this block
+	// 			expect(u).to.be.undefined;
+	// 			done();
+	// 		})
+	// 		.catch((err) => {
+	// 			expect(err.message).to.equal("Field not valid: phone_number"); 
+	// 			done();
+	// 		});
+	// });
 
 	it(`Should create a user with a valid phone_number`, (done) => {
 		TEST_USER = new User(TEST_USER_DATA_PASS);
