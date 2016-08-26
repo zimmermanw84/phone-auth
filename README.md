@@ -1,5 +1,5 @@
 # Phone Auth
-[![Build Status](https://travis-ci.org/zimmermanw84/phone-auth.png?branch=master)](https://travis-ci.org/zimmermanw84/phone-auth)
+[![Build Status](https://travis-ci.org/zimmermanw84/phone-auth.png?branch=master)](https://travis-ci.org/zimmermanw84/phone-auth)  
 Build an Authentication service using twilio api.  
 
 ### Purpose
