@@ -69,7 +69,7 @@ describe(`User Unit Tests`, () => {
 			});
 	});
 
-	it(`User#serialize should return all public properties uf user object`, (done) => {
+	it(`User#serialize should return all public properties of user object`, (done) => {
 		let publicObject = TEST_USER.serialize();
 		expect(publicObject).to.have.all.keys('phone_number', 'id', 'first_name', 'last_name', 'username');
 		expect(publicObject.verification_code).to.be.undefined;
