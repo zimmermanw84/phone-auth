@@ -29,3 +29,10 @@ GET /users/:phone_number
 Headers: { authorization: <Auth_Token> }
 ```
 Returns User Object.  
+
+```
+PUT /users/:phone_number
+Headers: { authorization: <Auth_Token> }
+Body: { first_name: <String>,last_name: <String>, username: <String> phone_number: <Valid_10_Digit_Phone_Number> } // Any Updatable User Properties
+```
+Warning: Changing your phone_number will change your route (obviously)  
