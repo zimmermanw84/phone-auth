@@ -54,7 +54,10 @@ module.exports = class User {
 	*/
 	save() {
 		return Promise((resolve, reject) => {
-			if(!this._isValidPhoneNumber(this.phone_number)) reject(new Error("Field not valid: phone_number"));
+			if(!this._isValidPhoneNumber(this.phone_number)) {
+				reject(new Error("Field not valid: phone_number"));
+				return;
+			}
 
 			dynamodb.putItem({
 				TableName: TABLE_NAME,

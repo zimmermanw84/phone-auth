@@ -49,10 +49,28 @@ describe(`Test to ensure the API is returning correct status codes and data`, ()
 			});
 	});
 
-	// it(`POST /users/:phone_number/verify should return 200`)
+	it(`POST /users/:phone_number/verify should return 200`, (done) => {
+		api.post('/users/1231234567/verify')
+			.send({ verification_code })
+			.expect(200, done);
+	});
 
-	// it(`POST /users/:phone_number/verify should return authorization token`)
-	// it(`POST /users/:phone_number/verify should return 401 with invalid verification_code`)
+	it(`POST /users/:phone_number/verify should return authorization token`, (done) => {
+		api.post('/users/1231234567/verify')
+			.send({ verification_code })
+			.expect((res) => {
+				expect(res.body).to.have.property("authorization");
+				expect(res.body.authorization).to.not.be.null;
+				expect(res.body.authorization).to.be.a("string");
+			})
+			.expect(200, done);
+	})
+
+	it(`POST /users/:phone_number/verify should return 401 with invalid verification_code`, (done) => {
+		api.post('/users/1231234567/verify')
+			.send({ verification_code: "NOT VALID CODE" })
+			.expect(401, done);
+	});
 
 	after(() => {
 		TEST_USER.destroy();

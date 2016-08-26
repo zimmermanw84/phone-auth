@@ -107,7 +107,7 @@ const verifyUserHandler = (req, res, next) => {
 				// Current expiration of verification code is 5 min
 				(isVerificationCodeValid(user.verification_code_created_at))
 				) {
-				return res.json({authoization: user.auth_token});
+				return res.json({authorization: user.auth_token});
 			} else {
 				// None shall pass
 				return res.status(401).send();
