@@ -22,7 +22,7 @@ let verification_code;
 
 let auth_token;
 
-describe(`Test to ensure the API is returning correct status codes and data`, () => {
+describe(`Integration Tests`, () => {
 	// Setup
 	before(() => {
 		TEST_USER = new User(TEST_USER_DATA_PASS);
