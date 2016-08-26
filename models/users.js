@@ -170,6 +170,27 @@ module.exports = class User {
 	};
 
 	/**
+	* destroy {function}
+	* destroy user
+	*/
+	destroy() {
+		let queryObj = {
+			TableName: TABLE_NAME,
+			Key: { id: { S: this.id } }
+		};
+
+		return Promise((resolve, reject) => {
+			if(!this.id) reject(new Error("Reference Error: No ID Found"));
+
+			dynamodb.deleteItem(queryObj, (err, userData) => {
+				if(err) reject(err);
+				else resolve(userData);
+			});
+		});
+
+	}
+
+	/**
 	* _addDataToModel {function}
 	* Adds data to model after data returned from dynamo
 	*/
