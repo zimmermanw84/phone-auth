@@ -233,7 +233,7 @@ module.exports = class User {
 
 				// Build 'Value' query object
 				value = {};
-				value[`${this.propTypes[propertyToUpdate].type}`] = updateData[propertyToUpdate];
+				value[this.propTypes[propertyToUpdate].type] = updateData[propertyToUpdate];
 
 				// Add update query object
 				queryObj.AttributeUpdates[propertyToUpdate] = {
