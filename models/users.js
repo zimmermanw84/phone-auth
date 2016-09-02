@@ -267,13 +267,8 @@ module.exports = class User {
 	* Adds data to model after data returned from dynamo
 	*/
 	_addDataToModel(userData) {
-		this.id = userData.id.S;
-		this.phone_number = userData.phone_number.S;
-		this.first_name = (userData.first_name) ? userData.first_name.S : null;
-		this.last_name = (userData.last_name) ? userData.last_name.S : null;
-		this.username = (userData.username) ? userData.username.S : null;
-		this.auth_token = (userData.auth_token) ? userData.auth_token.S : null;
-		this.verification_code = (userData.verification_code) ? userData.verification_code.S : null;
-		this.verification_code_created_at = (userData.verification_code_created_at) ? userData.verification_code_created_at.S : null;
+		Object.keys(userData).forEach((property) => {
+			this[property] = userData[property][this.propTypes[property].type];
+		});
 	};
 };
